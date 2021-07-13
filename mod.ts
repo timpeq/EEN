@@ -1,5 +1,5 @@
-import { EENAuth, EENUser } from "./types.ts";
-import { splitCookie } from './splitcookie.ts';
+import { EENAccount, EENAuth, EENUser } from "./types.ts";
+import { splitCookie } from "./splitcookie.ts";
 
 export class EEN {
   authKey = "";
@@ -7,7 +7,7 @@ export class EEN {
   private auth: EENAuth;
   user: EENUser = {};
 
-  private get Host() {
+  private get host() {
     return `https://${this.user.active_brand_subdomain}.${this.auth.baseHost}`;
   }
   private get loginHost() {
@@ -18,30 +18,28 @@ export class EEN {
     this.auth = auth;
   }
 
-  async isAuth():Promise<boolean> {
-
-
+  async isAuth(): Promise<boolean> {
     const isAuthReqHeaders = new Headers();
-    this.cookies.forEach(element => {
-      isAuthReqHeaders.append("cookie", element)
+    this.cookies.forEach((element) => {
+      isAuthReqHeaders.append("cookie", element);
     });
 
-    const isAuthReq:RequestInit = {
+    const isAuthReq: RequestInit = {
       method: "get",
-      headers: isAuthReqHeaders
-    }
-    
+      headers: isAuthReqHeaders,
+    };
+
     const isAuthResp = await fetch(
       `${this.loginHost}/g/aaa/isauth`,
-      isAuthReq
+      isAuthReq,
     );
 
     if (isAuthResp.status == 200) return true;
     else if (isAuthResp.status == 401) return false;
     else {
-      throw `Unexpected isAuth response code: ${isAuthResp.status} ${isAuthResp.statusText}`
+      throw `Unexpected isAuth response code: ${isAuthResp.status} ${isAuthResp.statusText}`;
     }
-}
+  }
 
   async authenticate(): Promise<string> {
     if (!this.auth.username) {
@@ -90,15 +88,34 @@ export class EEN {
     const authorizeRespBody = await authorizeResp.json();
     this.user = { ...authorizeRespBody };
 
-    // Extract 'auth_key' from
     this.cookies = [];
-    authorizeResp.headers.forEach((element, index) => {
-      if (index == "set-cookie") {
-        this.cookies.push(element.toString());
-        this.authKey = splitCookie(element.toString(), "auth_key");
-      }
-    });
 
     return true;
+  }
+
+  async accountList(): Promise<EENAccount[]> {
+    const accountListReqHeaders = new Headers();
+    this.cookies.forEach((element) => {
+      accountListReqHeaders.append("cookie", element);
+    });
+
+    const accountListResp = await fetch(
+      `${this.loginHost}/g/account/list`,
+      {
+        method: "get",
+        headers: accountListReqHeaders,
+      },
+    );
+
+    if (accountListResp.status == 200) {
+      let accounts: EENAccount[] = [];
+      const accountListRespBody = await accountListResp.json();
+
+      accounts = { ...accountListRespBody };
+      return accounts;
+    } else if (accountListResp.status == 401) return [];
+    else {
+      throw `Unexpected accountList response code: ${accountListResp.status} ${accountListResp.statusText}`;
+    }
   }
 }
