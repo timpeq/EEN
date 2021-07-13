@@ -17,6 +17,12 @@ export class EEN {
     return `https://login.${this.auth.baseHost}`;
   }
 
+  /**
+   * Submit user/pass to retrieve intermediate token required by
+   * authorize in login process, normally called by logIn()
+   *
+   * @returns Promise
+   */
   async authenticate(): Promise<string> {
     if (!this.auth.username) {
       throw "Authenticate Failure: No Username Specified";
@@ -45,6 +51,11 @@ export class EEN {
     return authenticateRespBody["token"];
   }
 
+  /**
+   * Submit token to receive valid cookies and logged-in user object.
+   * @param {string} token - Token received from 
+   * @returns Promise which resolves boolean value of authorization success
+   */
   async authorize(token: string): Promise<boolean> {
     const authorizeBody = new FormData();
     authorizeBody.append("token", token);
@@ -69,7 +80,10 @@ export class EEN {
     return true;
   }
 
-  
+  /**
+   * 
+   * @returns Promise boolean of authentication test
+   */
   async isAuth(): Promise<boolean> {
     const isAuthReqHeaders = new Headers();
     this.cookies.forEach((element) => {
