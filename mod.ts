@@ -1,5 +1,4 @@
 import { EENAccount, EENAuth, EENUser } from "./types.ts";
-import { splitCookie } from "./splitcookie.ts";
 
 export class EEN {
   authKey = "";
