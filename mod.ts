@@ -17,29 +17,6 @@ export class EEN {
     return `https://login.${this.auth.baseHost}`;
   }
 
-  async isAuth(): Promise<boolean> {
-    const isAuthReqHeaders = new Headers();
-    this.cookies.forEach((element) => {
-      isAuthReqHeaders.append("cookie", element);
-    });
-
-    const isAuthReq: RequestInit = {
-      method: "get",
-      headers: isAuthReqHeaders,
-    };
-
-    const isAuthResp = await fetch(
-      `${this.loginHost}/g/aaa/isauth`,
-      isAuthReq,
-    );
-
-    if (isAuthResp.status == 200) return true;
-    else if (isAuthResp.status == 401) return false;
-    else {
-      throw `Unexpected isAuth response code: ${isAuthResp.status} ${isAuthResp.statusText}`;
-    }
-  }
-
   async authenticate(): Promise<string> {
     if (!this.auth.username) {
       throw "Authenticate Failure: No Username Specified";
@@ -91,6 +68,31 @@ export class EEN {
 
     return true;
   }
+
+  
+  async isAuth(): Promise<boolean> {
+    const isAuthReqHeaders = new Headers();
+    this.cookies.forEach((element) => {
+      isAuthReqHeaders.append("cookie", element);
+    });
+
+    const isAuthReq: RequestInit = {
+      method: "get",
+      headers: isAuthReqHeaders,
+    };
+
+    const isAuthResp = await fetch(
+      `${this.loginHost}/g/aaa/isauth`,
+      isAuthReq,
+    );
+
+    if (isAuthResp.status == 200) return true;
+    else if (isAuthResp.status == 401) return false;
+    else {
+      throw `Unexpected isAuth response code: ${isAuthResp.status} ${isAuthResp.statusText}`;
+    }
+  }
+
 
   async accountList(): Promise<EENAccount[]> {
     const accountListReqHeaders = new Headers();
