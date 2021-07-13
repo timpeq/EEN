@@ -77,6 +77,10 @@ export class EEN {
 
     this.cookies = [];
 
+    authorizeResp.headers.forEach((element, index) => {
+      if (index == "set-cookie") this.cookies.push(element.toString());
+    });
+    
     return true;
   }
 
