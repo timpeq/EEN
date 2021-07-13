@@ -23,7 +23,7 @@ export class EEN {
    *
    * @returns Promise
    */
-  async authenticate(): Promise<string> {
+  async authenticate(auth: EENAuth): Promise<string> {
     if (!this.auth.username) {
       throw "Authenticate Failure: No Username Specified";
     }
@@ -32,8 +32,8 @@ export class EEN {
     }
 
     const authenticateBody = new FormData();
-    authenticateBody.append("username", this.auth.username);
-    authenticateBody.append("password", this.auth.password);
+    authenticateBody.append("username", auth.username);
+    authenticateBody.append("password", auth.password);
 
     const authenticateResp = await fetch(
       `${this.loginHost}/g/aaa/authenticate`,
@@ -84,9 +84,17 @@ export class EEN {
     return true;
   }
 
+  async logIn():Promise<boolean> {
+    const token = await this.authenticate(this.auth);
+    const authorized = await this.authorize(token);
+    if (authorized === true) return true;
+    else return false;
+  }
+
   /**
+   * Checks if cookies are vaid.
    * 
-   * @returns Promise boolean of authentication test
+   * @returns Promise boolean
    */
   async isAuth(): Promise<boolean> {
     const isAuthReqHeaders = new Headers();
