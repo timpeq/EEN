@@ -7,15 +7,15 @@ export class EEN {
   private auth: EENAuth;
   user: EENUser = {};
 
+  constructor(auth: EENAuth) {
+    this.auth = auth;
+  }
+
   private get host() {
     return `https://${this.user.active_brand_subdomain}.${this.auth.baseHost}`;
   }
   private get loginHost() {
     return `https://login.${this.auth.baseHost}`;
-  }
-
-  constructor(auth: EENAuth) {
-    this.auth = auth;
   }
 
   async isAuth(): Promise<boolean> {
