@@ -16,6 +16,13 @@ export class EEN {
   private get loginHost() {
     return `https://login.${this.auth.baseHost}`;
   }
+  private get requestHeaders{
+    const headers = new Headers();
+    this.cookies.forEach((element) => {
+      headers.append("cookie", element);
+    });
+    return headers;
+  }
 
   /**
    * Submit user/pass to retrieve intermediate token required by
@@ -92,24 +99,17 @@ export class EEN {
   }
 
   /**
-   * Checks if cookies are vaid.
+   * Checks if session is valid
    * 
    * @returns Promise boolean
    */
   async isAuth(): Promise<boolean> {
-    const isAuthReqHeaders = new Headers();
-    this.cookies.forEach((element) => {
-      isAuthReqHeaders.append("cookie", element);
-    });
-
-    const isAuthReq: RequestInit = {
-      method: "get",
-      headers: isAuthReqHeaders,
-    };
-
     const isAuthResp = await fetch(
       `${this.loginHost}/g/aaa/isauth`,
-      isAuthReq,
+      {
+        method: "get",
+        headers: this.requestHeaders,
+      },
     );
 
     if (isAuthResp.status == 200) return true;
@@ -118,19 +118,13 @@ export class EEN {
       throw `Unexpected isAuth response code: ${isAuthResp.status} ${isAuthResp.statusText}`;
     }
   }
-
-
+  
   async accountList(): Promise<EENAccount[]> {
-    const accountListReqHeaders = new Headers();
-    this.cookies.forEach((element) => {
-      accountListReqHeaders.append("cookie", element);
-    });
-
     const accountListResp = await fetch(
       `${this.loginHost}/g/account/list`,
       {
         method: "get",
-        headers: accountListReqHeaders,
+        headers: this.requestHeaders,
       },
     );
 
