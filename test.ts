@@ -3,21 +3,23 @@ import { EEN } from './mod.ts';
 
 import "https://deno.land/x/dotenv@v2.0.0/load.ts";
 
+const envUser = Deno.env.get("EEN_USER");
+const envPass = Deno.env.get("EEN_PASS");
+const baseHost = Deno.env.get("EEN_BASE_HOST")
+
 const creds:EENAuth = {
-  username: Deno.env.get("EEN_USER"),
-  password: Deno.env.get("EEN_PASS"),
-  baseHost: Deno.env.get("EEN_BASE_HOST"),
+  username: envUser ? envUser : "",
+  password: envPass ? envPass : "",
+  baseHost: baseHost ? baseHost : "",
 }
 
 const een = new EEN(creds);
 try {
-  const token = await een.authenticate();
-  const authorized = await een.authorize(token);
-  console.log("Authorized?", authorized);
+  const logIn = await een.logIn();
+  if (logIn) console.log ("logIn result was", logIn)
   console.log(`Logged In As ${een.user.first_name} ${een.user.last_name}`)
   console.log("Brand", een.user.active_brand_subdomain);
   console.log("Cookies", een.cookies);
-  console.log("auth_key", een.authKey);
   const isAuth = await een.isAuth();
   console.log("isAuth?", isAuth);
 }
