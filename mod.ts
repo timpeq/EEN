@@ -118,7 +118,6 @@ export class EEN {
       throw `Unexpected isAuth response code: ${isAuthResp.status} ${isAuthResp.statusText}`;
     }
   }
-
   async accountList(): Promise<EENAccount[]> {
     const accountListResp = await fetch(
       `${this.loginHost}/g/account/list`,
