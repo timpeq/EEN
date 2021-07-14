@@ -1,7 +1,6 @@
 import { EENAccount, EENAuth, EENUser } from "./types.ts";
 
 export class EEN {
-  authKey = "";
   cookies: string[] = [];
   private auth: EENAuth;
   user: EENUser = {};
